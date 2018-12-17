@@ -18,18 +18,17 @@ import com.heaven.zimadtest.api.CatDogInterface;
 import com.heaven.zimadtest.utils.Constants;
 import com.heaven.zimadtest.model.CatDog;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AnimalListFragment extends Fragment implements CatDogCommunicable {
-    private static final String ARG_COLUMN_COUNT = "column-count";
     public static final String TAG = "tag";
+    public static final String ANIMALS_LIST = "animals_list";
 
-    private List<CatDog.Animal> animals;
-    private int mColumnCount = 1;
+    private ArrayList<CatDog.Animal> animals;
     private CatDogCommunicable mListener;
     private ProgressDialog progressDialog;
     private RecyclerView recyclerView;
@@ -41,24 +40,18 @@ public class AnimalListFragment extends Fragment implements CatDogCommunicable {
     public AnimalListFragment() {
     }
 
-    @SuppressWarnings("unused")
-    public static AnimalListFragment newInstance(int columnCount) {
-        AnimalListFragment fragment = new AnimalListFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String tag = Constants.CAT_FRAGMENT;
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             tag = getArguments().getString(TAG);
         }
-        getAnimals(tag);
+        if (savedInstanceState != null) {
+            animals = savedInstanceState.getParcelableArrayList(ANIMALS_LIST);
+        } else {
+            getAnimals(tag);
+        }
     }
 
     @Override
@@ -66,6 +59,7 @@ public class AnimalListFragment extends Fragment implements CatDogCommunicable {
         super.onResume();
         setTabVisibility(true);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,11 +70,8 @@ public class AnimalListFragment extends Fragment implements CatDogCommunicable {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+
             if (animals != null) {
                 recyclerView.setAdapter(new CatDogAdapter(animals, mListener, getContext()));
             }
@@ -166,10 +157,14 @@ public class AnimalListFragment extends Fragment implements CatDogCommunicable {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         if((progressDialog != null) && progressDialog.isShowing() ){
             progressDialog.dismiss();
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(ANIMALS_LIST, animals);
+    }
 }

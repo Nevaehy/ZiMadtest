@@ -20,7 +20,6 @@ import butterknife.ButterKnife;
 
 
 public class AnimalDetailsFragment extends Fragment implements CatDogCommunicable {
-    // TODO: Rename parameter arguments, choose names that match
 
     protected static final String ARG_POSITION = "pos";
     protected static final String ARG_NAME = "name";

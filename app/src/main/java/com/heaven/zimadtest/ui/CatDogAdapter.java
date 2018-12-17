@@ -14,7 +14,7 @@ import com.heaven.zimadtest.utils.GraphicUtils;
 import com.heaven.zimadtest.model.CatDog;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,11 +22,11 @@ import butterknife.ButterKnife;
 
 public class CatDogAdapter extends RecyclerView.Adapter<CatDogAdapter.ViewHolder> {
 
-    private final List<CatDog.Animal> mValues;
+    private final ArrayList<CatDog.Animal> mValues;
     private final CatDogCommunicable mListener;
     private final Context mContext;
 
-    public CatDogAdapter(List<CatDog.Animal> items, CatDogCommunicable listener, Context context) {
+    public CatDogAdapter(ArrayList<CatDog.Animal> items, CatDogCommunicable listener, Context context) {
         mValues = items;
         mListener = listener;
         mContext = context;

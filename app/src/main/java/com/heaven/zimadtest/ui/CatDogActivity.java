@@ -19,6 +19,8 @@ import butterknife.ButterKnife;
 public class CatDogActivity extends AppCompatActivity implements CatDogMvp.View, CatDogCommunicable {
     @BindView(R.id.tabLayout) TabLayout tabLayout;
 
+    private static final String CURRENT_TAB = "current_tab";
+
     private CatDogPresenter catDogPresenter;
     private FragmentManager fragmentManager;
 
@@ -116,6 +118,18 @@ public class CatDogActivity extends AppCompatActivity implements CatDogMvp.View,
     public void onDestroy() {
         super.onDestroy();
         catDogPresenter.detachView();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(CURRENT_TAB, tabLayout.getSelectedTabPosition());
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedState) {
+        super.onRestoreInstanceState(savedState);
+        tabLayout.getTabAt(savedState.getInt(CURRENT_TAB, 0)).select();
     }
 
     @Override
