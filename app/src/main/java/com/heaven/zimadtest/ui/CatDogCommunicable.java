@@ -1,4 +1,4 @@
-package com.heaven.zimadtest;
+package com.heaven.zimadtest.ui;
 
 public interface CatDogCommunicable {
     void onArticleSelected(int pos, String name, String url);
