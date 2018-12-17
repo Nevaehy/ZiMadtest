@@ -1,3 +1,3 @@
 # ZiMadtest
-1. Download
+1. Build
 2. Run
