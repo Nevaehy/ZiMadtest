@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.heaven.zimadtest.CatDogCommunicable;
 import com.heaven.zimadtest.R;
 import com.heaven.zimadtest.utils.GraphicUtils;
 import com.heaven.zimadtest.model.CatDog;
@@ -42,12 +41,14 @@ public class CatDogAdapter extends RecyclerView.Adapter<CatDogAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final int pos = position;
+        int width = (int) mContext.getResources().getDimension(R.dimen.small_image);
+
         holder.mItem = mValues.get(position);
         holder.mId.setText(String.valueOf(position+1));
         holder.mName.setText(mValues.get(position).getTitle());
         Picasso.get()
                 .load(mValues.get(position).getUrl())
-                .resize(GraphicUtils.convertDpToPixels(120, mContext), GraphicUtils.convertDpToPixels(120, mContext))
+                .resize(width, width)
                 .into(holder.mImage);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {

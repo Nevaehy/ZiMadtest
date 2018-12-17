@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.heaven.zimadtest.CatDogCommunicable;
 import com.heaven.zimadtest.R;
 import com.heaven.zimadtest.utils.GraphicUtils;
 import com.squareup.picasso.Picasso;
@@ -49,19 +48,16 @@ public class AnimalDetailsFragment extends Fragment implements CatDogCommunicabl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view;
-        if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            view = inflater.inflate(R.layout.fragment_details_landscape, container, false);
-        } else {
-            view = inflater.inflate(R.layout.fragment_details, container, false);
-        }
+        View view = inflater.inflate(R.layout.fragment_details, container, false);
+
         ButterKnife.bind(this, view);
         if (getArguments() != null) {
             mId.setText(String.valueOf(getArguments().getInt(ARG_POSITION)));
             mName.setText(getArguments().getString(ARG_NAME));
             Picasso.get()
                     .load(getArguments().getString(ARG_URL))
-                    .resize(GraphicUtils.getScreenWidth(getActivity()), GraphicUtils.convertDpToPixels(300, getContext()))
+                    .resize((int) getResources().getDimension(R.dimen.big_image_width),
+                            (int) getResources().getDimension(R.dimen.big_image_height))
                     .into(mImage);
         }
         return view;
