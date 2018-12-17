@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.AnimalDetailsFragment">
+
+    <ImageView
+        android:layout_width="@dimen/big_image_landscape"
+        android:layout_height="@dimen/big_image_landscape"
+        android:layout_marginRight="@dimen/text_margin"
+        android:layout_marginLeft="@dimen/text_margin"
+        android:id="@+id/details_image"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:textSize="@dimen/text_size_medium"
+        android:textColor="@color/colorLightBlack"
+        android:id="@+id/details_id"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:textSize="@dimen/text_size_medium"
+        android:textColor="@color/colorLightBlack"
+        android:id="@+id/details_name"/>
+
+</LinearLayout>
