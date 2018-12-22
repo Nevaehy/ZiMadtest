@@ -2,16 +2,16 @@ package com.heaven.zimadtest.ui;
 
 import com.heaven.zimadtest.utils.Constants;
 
-public class CatDogPresenter implements CatDogMvp.Presenter {
-    CatDogMvp.View mView;
+public class CatDogPresenter implements CatDogMvp.MainPresenter {
+    CatDogMvp.MainView mView;
 
-    public CatDogPresenter(CatDogMvp.View view) {
+    public CatDogPresenter(CatDogMvp.MainView view) {
         attachView(view);
         mView.init();
     }
 
     @Override
-    public void attachView(CatDogMvp.View view) {
+    public void attachView(CatDogMvp.MainView view) {
         mView = view;
     }
 
@@ -21,20 +21,15 @@ public class CatDogPresenter implements CatDogMvp.Presenter {
     }
 
     @Override
-    public void onArticleSelected(int pos, String name, String url) {
-        mView.showArticleDetails(pos, name, url);
-    }
-
-    @Override
     public void onTabSelected(String tabText) {
         if (tabText.equals(Constants.CAT)){
-            if (mView.getFragManager().findFragmentByTag(Constants.CAT_FRAGMENT) == null) {
+            if (mView.isFragmentExist(Constants.CAT_FRAGMENT)) {
                 mView.addArticleList(Constants.CAT_FRAGMENT, Constants.DOG_FRAGMENT);
             } else {
                 mView.replaceArticleList(Constants.CAT_FRAGMENT, Constants.DOG_FRAGMENT);
             }
         } else {
-            if (mView.getFragManager().findFragmentByTag(Constants.DOG_FRAGMENT) == null) {
+            if (mView.isFragmentExist(Constants.DOG_FRAGMENT)) {
                 mView.addArticleList(Constants.DOG_FRAGMENT, Constants.CAT_FRAGMENT);
             } else {
                 mView.replaceArticleList(Constants.DOG_FRAGMENT, Constants.CAT_FRAGMENT);

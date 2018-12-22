@@ -4,7 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,19 +18,26 @@ import com.heaven.zimadtest.utils.Constants;
 import com.heaven.zimadtest.model.CatDog;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AnimalListFragment extends Fragment implements CatDogCommunicable {
+public class AnimalListFragment extends Fragment implements CatDogMvp.ListView {
     public static final String TAG = "tag";
     public static final String ANIMALS_LIST = "animals_list";
 
     private ArrayList<CatDog.Animal> animals;
-    private CatDogCommunicable mListener;
     private ProgressDialog progressDialog;
-    private RecyclerView recyclerView;
+
+    ListActionsListener mListener;
+
+    CatDogListPresenter catDogListPresenter;
+
+    @BindView(R.id.list) RecyclerView recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -42,20 +50,22 @@ public class AnimalListFragment extends Fragment implements CatDogCommunicable {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String tag = Constants.CAT_FRAGMENT;
+
+        catDogListPresenter = new CatDogListPresenter(this);
+
         if (getArguments() != null) {
             tag = getArguments().getString(TAG);
         }
         if (savedInstanceState != null) {
             animals = savedInstanceState.getParcelableArrayList(ANIMALS_LIST);
         } else {
-            getAnimals(tag);
+            catDogListPresenter.getAnimals(tag);
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        setTabVisibility(true);
     }
 
 
@@ -63,30 +73,33 @@ public class AnimalListFragment extends Fragment implements CatDogCommunicable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        ButterKnife.bind(this, view);
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-            if (animals != null) {
-                recyclerView.setAdapter(new CatDogAdapter(animals, mListener, getContext()));
-            }
+        if (animals != null) {
+            recyclerView.setAdapter(new CatDogAdapter(animals, mListener, getContext()));
         }
+
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getActivity().findViewById(R.id.tabLayout)
+                .setVisibility(View.VISIBLE);
     }
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof CatDogCommunicable) {
-            mListener = (CatDogCommunicable) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement CatDogCommunicable");
-        }
+        mListener = new ListActionsListener() {
+            @Override
+            public void onArticleSelected(int id, String name, String url) {
+                catDogListPresenter.onArticleSelected(id, name, url);
+            }
+        };
     }
 
     @Override
@@ -95,46 +108,7 @@ public class AnimalListFragment extends Fragment implements CatDogCommunicable {
         mListener = null;
     }
 
-    @Override
-    public void onArticleSelected(int pos, String name, String url) {
-        mListener.onArticleSelected(pos, name, url);
-    }
-
-    @Override
-    public void setTabVisibility(boolean visibility) {
-        mListener.setTabVisibility(visibility);
-    }
-
-
-    public void getAnimals(String tag) {
-        showLoading();
-        Call<CatDog> call;
-        if (tag.equals(Constants.CAT_FRAGMENT)) {
-            call = CatDogInterface.Creator.getRetrofitClient().getAnimals(Constants.CAT);
-        } else {
-            call = CatDogInterface.Creator.getRetrofitClient().getAnimals(Constants.DOG);
-        }
-
-        // Execute the call asynchronously. Get a positive or negative callback.
-        call.enqueue(new Callback<CatDog>() {
-            @Override
-            public void onResponse(Call<CatDog> call, Response<CatDog> response) {
-                if (response != null && response.body() != null)  {
-                    animals = response.body().getData();
-                    recyclerView.setAdapter(new CatDogAdapter(animals, mListener, getContext()));
-                    hideLoading();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<CatDog> call, Throwable t) {
-                hideLoading();
-                Toast.makeText(getContext(), "Something went wrong. Check internet connection or try again later.", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void showLoading() {
+    public void showLoading() {
         if (progressDialog == null) {
             try {
                 progressDialog = ProgressDialog.show(getContext(), "", "Loading...");
@@ -153,11 +127,41 @@ public class AnimalListFragment extends Fragment implements CatDogCommunicable {
     }
 
     @Override
+    public void showError(String error) {
+        Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void processResponse(ArrayList<CatDog.Animal> ani) {
+        animals = ani;
+        recyclerView.setAdapter(new CatDogAdapter(animals, mListener, getContext()));
+    }
+
+    @Override
+    public void showArticleDetails(int pos, String name, String url) {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        AnimalDetailsFragment detFragment = new AnimalDetailsFragment();
+
+        // put bundle here
+        Bundle bundle = new Bundle();
+        bundle.putInt(AnimalDetailsFragment.ARG_POSITION, pos);
+        bundle.putString(AnimalDetailsFragment.ARG_NAME, name);
+        bundle.putString(AnimalDetailsFragment.ARG_URL, url);
+        detFragment.setArguments(bundle);
+
+        fragmentTransaction.replace(R.id.fragment_container, detFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if((progressDialog != null) && progressDialog.isShowing() ){
             progressDialog.dismiss();
         }
+        catDogListPresenter.detachView();
     }
 
     @Override
@@ -165,4 +169,5 @@ public class AnimalListFragment extends Fragment implements CatDogCommunicable {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(ANIMALS_LIST, animals);
     }
+
 }

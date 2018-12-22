@@ -14,7 +14,7 @@ import com.heaven.zimadtest.utils.Constants;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class CatDogActivity extends AppCompatActivity implements CatDogMvp.View, CatDogCommunicable {
+public class CatDogActivity extends AppCompatActivity implements CatDogMvp.MainView {
     @BindView(R.id.tabLayout) TabLayout tabLayout;
 
     private static final String CURRENT_TAB = "current_tab";
@@ -33,37 +33,6 @@ public class CatDogActivity extends AppCompatActivity implements CatDogMvp.View,
         if (savedInstanceState == null) {
             addArticleList(Constants.CAT_FRAGMENT, Constants.DOG_FRAGMENT);
         }
-    }
-
-    @Override
-    public void onArticleSelected(int pos, String name, String url) {
-        catDogPresenter.onArticleSelected(pos, name, url);
-    }
-
-    @Override
-    public void setTabVisibility(boolean visibility) {
-        if (visibility) {
-            tabLayout.setVisibility(View.VISIBLE);
-        } else {
-            tabLayout.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void showArticleDetails(int pos, String name, String url) {
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        AnimalDetailsFragment detFragment = new AnimalDetailsFragment();
-
-        // put bundle here
-        Bundle bundle = new Bundle();
-        bundle.putInt(AnimalDetailsFragment.ARG_POSITION, pos);
-        bundle.putString(AnimalDetailsFragment.ARG_NAME, name);
-        bundle.putString(AnimalDetailsFragment.ARG_URL, url);
-        detFragment.setArguments(bundle);
-
-        fragmentTransaction.replace(R.id.fragment_container, detFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
     }
 
     @Override
@@ -89,6 +58,11 @@ public class CatDogActivity extends AppCompatActivity implements CatDogMvp.View,
         fragmentTransaction.hide(fragmentManager.findFragmentByTag(hideFragTag));
         fragmentTransaction.show(fragmentManager.findFragmentByTag(showFragTag));
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public boolean isFragmentExist(String tag) {
+        return fragmentManager.findFragmentByTag(tag) == null;
     }
 
     @Override
@@ -128,11 +102,6 @@ public class CatDogActivity extends AppCompatActivity implements CatDogMvp.View,
     public void onRestoreInstanceState(Bundle savedState) {
         super.onRestoreInstanceState(savedState);
         tabLayout.getTabAt(savedState.getInt(CURRENT_TAB, 0)).select();
-    }
-
-    @Override
-    public FragmentManager getFragManager() {
-        return fragmentManager;
     }
 
 }

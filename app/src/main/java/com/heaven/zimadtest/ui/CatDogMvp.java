@@ -1,23 +1,38 @@
 package com.heaven.zimadtest.ui;
 
 import android.support.v4.app.FragmentManager;
-import android.widget.TableLayout;
+
+import com.heaven.zimadtest.model.CatDog;
+
+import java.util.ArrayList;
 
 public interface CatDogMvp {
 
-    interface View {
+    interface MainView {
         void init();
-        void showArticleDetails(int pos, String name, String url);
         void addArticleList(String addFragTag, String hideFragTag);
         void replaceArticleList(String showFragTag, String hideFragTag);
-        FragmentManager getFragManager();
+        boolean isFragmentExist(String tag);
     }
 
-
-    interface Presenter {
-        void attachView(CatDogMvp.View view);
+    interface MainPresenter {
+        void attachView(CatDogMvp.MainView view);
         void detachView();
-        void onArticleSelected(int pos, String name, String url);
         void onTabSelected(String tabText);
+    }
+
+    interface ListView {
+        void showLoading();
+        void hideLoading();
+        void showError(String error);
+        void processResponse(ArrayList<CatDog.Animal> animals);
+        void showArticleDetails(int id, String name, String url);
+    }
+
+    interface ListPresenter {
+        void attachView(CatDogMvp.ListView view);
+        void detachView();
+        void getAnimals(String tag);
+        void onArticleSelected(int id, String name, String url);
     }
 }

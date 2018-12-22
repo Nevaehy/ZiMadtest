@@ -22,10 +22,10 @@ import butterknife.ButterKnife;
 public class CatDogAdapter extends RecyclerView.Adapter<CatDogAdapter.ViewHolder> {
 
     private final ArrayList<CatDog.Animal> mValues;
-    private final CatDogCommunicable mListener;
+    private final ListActionsListener mListener;
     private final Context mContext;
 
-    public CatDogAdapter(ArrayList<CatDog.Animal> items, CatDogCommunicable listener, Context context) {
+    public CatDogAdapter(ArrayList<CatDog.Animal> items, ListActionsListener listener, Context context) {
         mValues = items;
         mListener = listener;
         mContext = context;

@@ -18,7 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class AnimalDetailsFragment extends Fragment implements CatDogCommunicable {
+public class AnimalDetailsFragment extends Fragment {
 
     protected static final String ARG_POSITION = "pos";
     protected static final String ARG_NAME = "name";
@@ -27,8 +27,6 @@ public class AnimalDetailsFragment extends Fragment implements CatDogCommunicabl
     @BindView (R.id.details_image) ImageView mImage;
     @BindView (R.id.details_id) TextView mId;
     @BindView (R.id.details_name) TextView mName;
-
-    private CatDogCommunicable mListener;
 
     public AnimalDetailsFragment() {
         // Required empty public constructor
@@ -42,7 +40,6 @@ public class AnimalDetailsFragment extends Fragment implements CatDogCommunicabl
     @Override
     public void onResume() {
         super.onResume();
-        setTabVisibility(false);
     }
 
     @Override
@@ -63,33 +60,22 @@ public class AnimalDetailsFragment extends Fragment implements CatDogCommunicabl
         return view;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getActivity().findViewById(R.id.tabLayout)
+                .setVisibility(View.GONE);
+    }
+
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof CatDogCommunicable) {
-            mListener = (CatDogCommunicable) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement CatDogCommunicable");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
-
-    @Override
-    public void onArticleSelected(int pos, String name, String url) {
-
-    }
-
-    @Override
-    public void setTabVisibility(boolean visibility) {
-        mListener.setTabVisibility(visibility);
-    }
-
 
 }
